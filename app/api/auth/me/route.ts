@@ -1,0 +1,1 @@
+import { currentUser,getSession } from '@/lib/auth';import { json } from '@/lib/api';export async function GET(){const u=await currentUser();const s=await getSession();return json({user:u?{id:u.id,name:u.name,email:u.email,role:u.role,integrity:u.integrity,mfaEnabled:u.mfaEnabled}:null,mfaPending:!!s&&!s.mfaPassed});}

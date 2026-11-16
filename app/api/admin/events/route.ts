@@ -1,0 +1,1 @@
+import { requireUser,json,fail,err } from '@/lib/api';import { db } from '@/lib/db';export async function GET(){try{const u=await requireUser();if(!u)return fail('Unauthorized',401);if(!['ADMIN','AUDITOR'].includes(u.role))return fail('Forbidden',403);return json(await db.securityEvent.findMany({orderBy:{createdAt:'desc'},take:100}));}catch(e){return err(e)}}

@@ -1,0 +1,84 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+enum Role { ADMIN MAKER CHECKER FINANCE AUDITOR VIEWER }
+enum Integrity { LOW MEDIUM HIGH }
+enum TransactionStatus { DRAFT SUBMITTED PENDING_APPROVAL APPROVED REJECTED POSTED }
+model User {
+ id String @id @default(cuid())
+ name String
+ email String @unique
+ passwordHash String
+ role Role @default(VIEWER)
+ integrity Integrity @default(LOW)
+ active Boolean @default(true)
+ failedLogins Int @default(0)
+ lockedUntil DateTime?
+ mfaEnabled Boolean @default(false)
+ mfaSecret String?
+ mfaPendingSecret String?
+ recoveryHashes Json?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ resources Resource[] @relation("ResourceOwner")
+ createdTransactions LedgerTransaction[] @relation("TransactionMaker")
+ approvals Approval[]
+ audits LoginAudit[]
+}
+model Department { id String @id @default(cuid()) name String @unique resources Resource[] }
+model Resource {
+ id String @id @default(cuid())
+ name String
+ description String @default("")
+ integrity Integrity @default(LOW)
+ departmentId String?
+ department Department? @relation(fields:[departmentId],references:[id])
+ ownerId String?
+ owner User? @relation("ResourceOwner",fields:[ownerId],references:[id])
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+}
+model LedgerTransaction {
+ id String @id @default(cuid())
+ reference String @unique
+ description String
+ amount Decimal @db.Decimal(16,2)
+ integrity Integrity @default(LOW)
+ status TransactionStatus @default(DRAFT)
+ makerId String
+ maker User @relation("TransactionMaker",fields:[makerId],references:[id])
+ approvals Approval[]
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ postedAt DateTime?
+ version Int @default(1)
+}
+model Approval {
+ id String @id @default(cuid())
+ transactionId String
+ transaction LedgerTransaction @relation(fields:[transactionId],references:[id])
+ approverId String
+ approver User @relation(fields:[approverId],references:[id])
+ decision String
+ note String @default("")
+ createdAt DateTime @default(now())
+}
+model LoginAudit {
+ id String @id @default(cuid())
+ userId String?
+ user User? @relation(fields:[userId],references:[id])
+ submittedEmail String
+ ipAddress String?
+ status String
+ failureReason String?
+ correlationId String @default(cuid())
+ createdAt DateTime @default(now())
+ @@index([createdAt])
+}
+model SecurityEvent {
+ id String @id @default(cuid())
+ actorId String?
+ kind String
+ detail String
+ createdAt DateTime @default(now())
+ @@index([createdAt])
+}

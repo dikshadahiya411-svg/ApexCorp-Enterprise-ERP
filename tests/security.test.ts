@@ -1,0 +1,2 @@
+import {describe,it,expect} from 'vitest';import {canRead,canWrite} from '../lib/security';
+describe('strict Biba integrity policy',()=>{const levels=['LOW','MEDIUM','HIGH'] as const;const numbers={LOW:1,MEDIUM:2,HIGH:3};for(const subject of levels)for(const object of levels){it(`${subject} reading ${object}`,()=>expect(canRead(subject,object)).toBe(numbers[object]>=numbers[subject]));it(`${subject} writing ${object}`,()=>expect(canWrite(subject,object)).toBe(numbers[subject]>=numbers[object]));}});
