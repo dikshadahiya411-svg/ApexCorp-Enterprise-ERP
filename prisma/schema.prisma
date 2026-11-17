@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum Role {
   ADMIN
   MAKER
@@ -13,11 +15,13 @@ enum Role {
   AUDITOR
   VIEWER
 }
+
 enum Integrity {
   LOW
   MEDIUM
   HIGH
 }
+
 enum TransactionStatus {
   DRAFT
   SUBMITTED
