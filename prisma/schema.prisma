@@ -1,8 +1,31 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql" url = env("DATABASE_URL") }
-enum Role { ADMIN MAKER CHECKER FINANCE AUDITOR VIEWER }
-enum Integrity { LOW MEDIUM HIGH }
-enum TransactionStatus { DRAFT SUBMITTED PENDING_APPROVAL APPROVED REJECTED POSTED }
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum Role {
+  ADMIN
+  MAKER
+  CHECKER
+  FINANCE
+  AUDITOR
+  VIEWER
+}
+enum Integrity {
+  LOW
+  MEDIUM
+  HIGH
+}
+enum TransactionStatus {
+  DRAFT
+  SUBMITTED
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  POSTED
+}
 model User {
  id String @id @default(cuid())
  name String
@@ -24,7 +47,11 @@ model User {
  approvals Approval[]
  audits LoginAudit[]
 }
-model Department { id String @id @default(cuid()) name String @unique resources Resource[] }
+model Department {
+  id String @id @default(cuid())
+  name String @unique
+  resources Resource[]
+}
 model Resource {
  id String @id @default(cuid())
  name String
